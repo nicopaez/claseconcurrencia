@@ -21,4 +21,8 @@ public class Boleteria {
             throw new RuntimeException();
         }
     }
+
+    public int getCantidadDeEntradas() {
+        return this.cantidadDeEntradasDisponibles;
+    }
 }
