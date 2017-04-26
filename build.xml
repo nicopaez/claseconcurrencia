@@ -1,0 +1,84 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="nicopaez.tutoriales.oo.notas" basedir="." default="test">
+	<property name="build" location="build" />
+	<property name="libs" location="libs" />
+	<property name="classes.dir" location="build" />
+	<property name="reports.dir" location="${build}/reports" />
+	<property name="reports.xml.dir" location="${reports.dir}/junit-xml" />
+	<property name="reports.html.dir" location="${reports.dir}/junit-html" />
+	<property name="src.dir" location="src" />
+	<property name="coverage.xml.dir" location="${reports.dir}/cobertura-xml" />
+	<property name="coverage.summaryxml.dir" location="${reports.dir}/cobertura-summary-xml" />
+	<property name="coverage.html.dir" location="${reports.dir}/cobertura-html" />
+
+
+	<path id="classpath">
+		<fileset dir="${libs}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${build}" />
+		<pathelement location="${build}/tests" />
+	</path>
+
+	<target name="setup">
+		<delete dir="${build}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${build}/classes" />
+		<mkdir dir="${build}/tests" />
+        <mkdir dir="${reports.dir}" />
+	</target>
+
+	<target name="compilar.aplicacion">
+		<javac srcdir="src" destdir="${build}" includeantruntime="false" debug="yes" target="1.8">
+		</javac>
+	</target>
+
+    <target name="compilar.tests" depends="compilar.aplicacion">
+        <javac srcdir="test" destdir="${build}/tests" debug="yes" target="1.8">
+            <classpath refid="classpath" />
+        </javac>
+    </target>
+
+    <target name="ejecutar.tests" depends="compilar.tests">
+        <junit fork="yes" failureProperty="test.failure" forkmode="once" showoutput="true">
+            <classpath location="${build}" />
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
+            <batchtest todir="${reports.xml.dir}" unless="testcase">
+                <fileset dir="${build}/tests" includes="**/*Test.class" />
+                <fileset dir="${build}/tests" includes="**/Prueba*.class" />
+            </batchtest>
+        </junit>
+        <fail message="Pruebas fallidas" if="test.failure" />
+        <junitreport todir="${reports.xml.dir}">
+            <fileset dir="${reports.xml.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="frames" todir="${reports.html.dir}" />
+        </junitreport>
+    </target>
+
+	<target name="init">
+		<mkdir dir="${reports.xml.dir}" />
+		<mkdir dir="${reports.html.dir}" />
+	</target>
+
+
+
+    <target name="compilar.paquete" depends="compilar.aplicacion">
+		<javac srcdir="src" destdir="${build}/classes" debug="no"  includeantruntime="false">
+		</javac>
+	</target>
+
+	<target name="empaquetar" depends="compilar.paquete">
+		<jar destfile="${build}/dist/concurrencia.jar" basedir="${build}/classes" />
+	</target>
+
+	<target name="ejecutar.aplicacion" depends="empaquetar">
+		<java classname="concurrencia.Programa" fork="true">
+			<classpath refid="classpath" />
+			<classpath location="${build}/dist/concurrencia.jar" />
+		</java>
+	</target>
+
+</project>
