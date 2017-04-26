@@ -6,7 +6,7 @@ package concurrencia;
 public class Programa {
 
     public static final void main(String args[]) throws InterruptedException {
-        System.out.println("hola");
+        System.out.println("Ejecutando programa");
 
         Boleteria boleteriaCompartida = new Boleteria();
         Comprador comprador1 = new Comprador(boleteriaCompartida);
